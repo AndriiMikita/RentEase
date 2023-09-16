@@ -1,13 +1,115 @@
 {% extends "layout.html" %}
+{% load static %}
 
+{% block style %}
+{% endblock style %}
+    
 
+{% block css %}
+    <link rel="stylesheet" type="text/css" href="{% static 'css/apartment.css' %}">
+{% endblock css %}
+    
 {% block title %}
     <title>{{ apartment.name }}</title>
 {% endblock title %}
-    
 
 {% block body %}
-    <h1>{{apartment.name}}</h1>
-    <h3>{{apartment.town}}-{{apartment_type}}</h3>
+    <div class="d-flex flex-column align-items-start ms-5">
+        <h1 class="mb-0">{{ apartment.name }}</h1>
+        <h3 class="text-muted mt-0">{{ apartment.town }} - {{ apartment_type }}</h3>
+        {% with text=apartment.description %}
+            {% if text|wordcount > 100 %}
+                <div class="half-content" id="half-{{ apartment.pk }}">{{text|safe|linebreaksbr|truncatewords:80}}<a data-id="{{ apartment.pk }}" href="javascript:void();" class="show-hide-btn"><br>More details</a></div>
+                <div class="full-content" id="full-{{apartment.pk }}" style="display: none;">{{ text|safe|linebreaksbr }}<br/><a data-id="{{ apartment.pk}}" href="javascript:void();" class="show-hide-btn">Hide details</a></div>
+            {% else %}
+                <p>
+                    {{ text|safe|linebreaksbr }}
+                </p>
+            {% endif %}
+        {% endwith %}
+        <div>
+            
+            {% if features|length > 5 %}
+                {% for feature in features|slice:":5"%}
+                    <div class="feature">
+                        {{ feature }}
+                    </div>
+                {% endfor %}
+                {% for feature in features %}
+                    <div class="feature_full" style="display: none;">
+                        {{ feature }}
+                    </div>
+                {% endfor %}
+                <a href="#" class="show-hide-features">More features</a>
+            {% else %}
+                {% for feature in features %}
+                    <div class="feature">
+                        {{ feature }}
+                    </div>
+                {% endfor %}
+            {% endif %}
+          </div>
+    </div>
+    <div class="container">
+        <div class="carousel">
+            {% for image in apartment.apartmentimages_set.all %}
+                <input type="radio" id="carousel-{{image.pk}}" name="carousel[]" 
+                    {% if image == apartment.apartmentimages_set.first %}
+                        checked
+                    {% endif %}
+                >
+            {% endfor %}
+                
+            <ul class="carousel__items">
+                {% for image in apartment.apartmentimages_set.all %}
+                    <li class="carousel__item"><img src="{{image.image.url}}" alt="image.apartment.name"></li>
+                {% endfor %}
+            </ul>
+         <div class="carousel__prev">
+            {% for image in apartment.apartmentimages_set.all %}
+                <label for="carousel-{{image.pk}}"></label>
+            {% endfor %}
+         </div>
+         <div class="carousel__next">
+            {% for image in apartment.apartmentimages_set.all %}
+                <label for="carousel-{{image.pk}}"></label>
+            {% endfor %}
+         </div>
+         <div class="carousel__nav">
+            {% for image in apartment.apartmentimages_set.all %}
+                <label for="carousel-{{image.pk}}"></label>
+            {% endfor %}
+         </div>
+       </div>
+     </div>
 {% endblock body %}
+
+
+{% block script %}
+    <script>
+        $(document).ready(function() {
+            $(".show-hide-btn").click(function() {
+                var id = $(this).data("id");
+                $("#half-" + id).toggle();//hide/show..
+                $("#full-" + id).toggle();
+            })
+        })
+
+        $(document).ready(function() {
+            var featuresVisible = false;
+        
+            $(".show-hide-features").click(function(e) {
+              e.preventDefault();
+              $(".feature").toggle();
+              $(".feature_full").toggle();
+              featuresVisible = !featuresVisible;
+              if (featuresVisible) {
+                $(this).text("Less features");
+              } else {
+                $(this).text("More features");
+              }
+            });
+          });
+    </script>
+{% endblock script %}
     

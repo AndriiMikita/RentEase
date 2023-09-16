@@ -40,6 +40,9 @@ class ApartmentFeature(models.Model):
                                 default="")
     count = models.PositiveIntegerField(default=0,)
     
+    def __str__(self):
+        return self.feature.name
+    
 class Type(models.Model):
     name = models.CharField(unique=True, 
                             max_length=100)

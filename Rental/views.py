@@ -9,5 +9,7 @@ class Apartment_view(View):
         apartment = get_object_or_404(Apartment, pk=object_id)
         
         context = {'apartment': apartment,
-                   'apartment_type': apartment.type_set.first(),}
+                   'apartment_type': apartment.type_set.first(),
+                   'features': apartment.apartmentfeature_set.all(),
+                   }
         return render(request, self.template_name, context)
